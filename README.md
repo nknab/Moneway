@@ -41,3 +41,6 @@ In order to build and run code,open a terminal in the **MonewayV1.0 Directory** 
 In order to make a Transaction Open a New terminal and run the following code:
       
       curl -XPOST http://localhost:8801/transct -d '{"transaction": {"AccountID" : "1", "Description" : "This is a test", "Amount" : 350.00, "Currency" : "Euro", "TransactionType" : "CREDIT"}}'
+      
+ ## Future Works
+ In order for easy workflow within Moneway, we will be migrating to ScyllaDB.
