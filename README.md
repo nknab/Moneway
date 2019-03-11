@@ -16,7 +16,7 @@ The goal of the exercise is to apply (at most) the good practices of microservic
 ## Database
 This makes use of MySql Database
 
-In the **config/config.toml** file you will find the configuration file for the Database. Mkae changes to suit your database settings. 
+In the **config/config.toml** file you will find the configuration file for the Database. Make changes to suit your database settings. 
 
       server = "127.0.0.1"
       port = "3306"
@@ -25,7 +25,7 @@ In the **config/config.toml** file you will find the configuration file for the 
       password = "your password"
       
 
-The database schema could be found in the **moneway.sql** file
+The database schema could be found in the **moneway.sql** file.
 
 
 ## Building and Running
