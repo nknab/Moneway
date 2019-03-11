@@ -1,0 +1,24 @@
+go get github.com/go-kit/kit/...
+go get github.com/kujtimiihoxha/kit
+
+#Creating the service
+kit new service 
+
+#Creating default middleware
+kit generate service transactions --dmw
+
+kit generate service balance -t grpc --dmw
+
+kit generate docker
+
+docker-compose up
+
+docker-compose up -d etcd
+
+docker-compose up --build
+
+WORKDIR /go/src/github.com/nknab/Moneway/
+
+docker container ls -a
+
+docker system prune
