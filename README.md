@@ -12,4 +12,15 @@ These are the Features:
 The goal of the exercise is to apply (at most) the good practices of microservices ([microservices.io](https:microservices.io) and [gRPC](grpc.io)), the mastery of the Go language, and the mastery of database operations.
 
 ## Database
-This uses MySql Database
+This makes use of MySql Database
+
+In the **config/config.toml** file you will find the configuration file for the Database. Mkae changes to suit your database settings. 
+
+`server = "127.0.0.1"
+port = "3306"
+database = "moneway"
+user = "your username"
+password = "your password"
+`
+
+The database schema could be found in the **moneway.sql** file
