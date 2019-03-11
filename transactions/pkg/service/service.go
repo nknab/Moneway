@@ -20,7 +20,6 @@ import (
 	"fmt"
 	"log"
 	"strconv"
-	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/nknab/MonewayV1.0/balance/pkg/grpc/pb"
@@ -30,7 +29,6 @@ import (
 
 type Transaction struct {
 	AccountID   string
-	CreatedAt   time.Time
 	Description string
 	Amount      float32
 	Currency    string
