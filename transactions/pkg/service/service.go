@@ -21,6 +21,7 @@ import (
 	"log"
 	"strconv"
 
+	"github.com/go-kit/kit/sd/etcd"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/nknab/MonewayV1.0/balance/pkg/grpc/pb"
 	db "github.com/nknab/MonewayV1.0/database"
@@ -28,10 +29,11 @@ import (
 )
 
 type Transaction struct {
-	AccountID   string
-	Description string
-	Amount      float32
-	Currency    string
+	AccountID       string
+	Description     string
+	Amount          float32
+	Currency        string
+	TransactionType string
 }
 
 // TransactionsService describes the service.
@@ -46,6 +48,9 @@ type basicTransactionsService struct {
 
 func (b *basicTransactionsService) Transct(ctx context.Context, transaction Transaction) (e0 error) {
 	// TODO implement the business logic of Transct
+	ctx, stop := context.WithCancel(context.Background())
+	defer stop()
+
 	//Initializing the Database package
 	db.Init()
 
@@ -58,31 +63,24 @@ func (b *basicTransactionsService) Transct(ctx context.Context, transaction Tran
 	var newBalance float32 = 0.0
 
 	table := "transactions"
-	columns := []string{"account_id", "description", "amount", "old_balance", "new_balance", "currency"}
-	values := []string{transaction.AccountID, transaction.Description, fmt.Sprintf("%f", transaction.Amount), fmt.Sprintf("%f", oldBalance), fmt.Sprintf("%f", newBalance), transaction.Currency}
+	columns := []string{"account_id", "description", "amount", "old_balance", "new_balance", "currency", "transaction_type"}
+	values := []string{transaction.AccountID, transaction.Description, fmt.Sprintf("%f", transaction.Amount), fmt.Sprintf("%f", oldBalance), fmt.Sprintf("%f", newBalance), transaction.Currency, transaction.TransactionType}
 
 	// Checking If It is a Debit Or A Credit
-	if transaction.TransactionType == 0 {
+	if transaction.TransactionType == "DEBIT" {
 		newBalance = oldBalance - transaction.Amount
-
-		//Updating the balance via the balance service.
-		_ = pb.UpdateBalanceRequest{AccountID: transaction.AccountID, Amount: fmt.Sprintf("%f", newBalance)}
 	} else {
 		newBalance = oldBalance + transaction.Amount
 	}
 
 	// Checking if there is enough Funds in the account before performing transaction
 	if newBalance >= 0.0 {
-		db.Insert(table, columns, values)
+		db.Insert(ctx, table, columns, values)
+		//Updating the balance via the balance service.
+		_ = pb.UpdateBalanceRequest{AccountID: transaction.AccountID, Amount: fmt.Sprintf("%f", newBalance)}
 	} else {
-		success = false
 		fmt.Println("Not Enough Funds in Account")
 	}
-
-	if err != nil {
-		panic(err.Error())
-	}
-	defer db.Close()
 
 	return e0
 }
@@ -91,7 +89,7 @@ func (b *basicTransactionsService) Transct(ctx context.Context, transaction Tran
 func NewBasicTransactionsService() TransactionsService {
 	var etcdServer = "http://etcd:2379"
 
-	client, err := sdetcd.NewClient(context.Background(), []string{etcdServer}, sdetcd.ClientOptions{})
+	client, err := etcd.NewClient(context.Background(), []string{etcdServer}, etcd.ClientOptions{})
 	if err != nil {
 		log.Printf("Not able to connect to etcd: %s", err.Error())
 		return new(basicTransactionsService)

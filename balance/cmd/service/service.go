@@ -4,10 +4,16 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"net"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+
 	endpoint1 "github.com/go-kit/kit/endpoint"
 	log "github.com/go-kit/kit/log"
-	sdetcd "github.com/go-kit/kit/sd/etcd"
 	prometheus "github.com/go-kit/kit/metrics/prometheus"
+	"github.com/go-kit/kit/sd/etcd"
 	lightsteptracergo "github.com/lightstep/lightstep-tracer-go"
 	endpoint "github.com/nknab/MonewayV1.0/balance/pkg/endpoint"
 	grpc "github.com/nknab/MonewayV1.0/balance/pkg/grpc"
@@ -19,13 +25,8 @@ import (
 	prometheus1 "github.com/prometheus/client_golang/prometheus"
 	promhttp "github.com/prometheus/client_golang/prometheus/promhttp"
 	grpc1 "google.golang.org/grpc"
-	"net"
-	"net/http"
-	"os"
-	"os/signal"
 	appdash "sourcegraph.com/sourcegraph/appdash"
 	opentracing "sourcegraph.com/sourcegraph/appdash/opentracing"
-	"syscall"
 )
 
 var tracer opentracinggo.Tracer
@@ -165,7 +166,7 @@ func initCancelInterrupt(g *group.Group) {
 	})
 }
 
-func registerService(logger log.Logger) (*sdetcd.Registrar, error) {
+func registerService(logger log.Logger) (*etcd.Registrar, error) {
 	var (
 		etcdServer = "http://etcd:2379"
 		prefix     = "/services/transactions/"
@@ -173,12 +174,12 @@ func registerService(logger log.Logger) (*sdetcd.Registrar, error) {
 		key        = prefix + instance
 	)
 
-	client, err := sdetcd.NewClient(context.Background(), []string{etcdServer}, sdetcd.ClientOptions{})
+	client, err := etcd.NewClient(context.Background(), []string{etcdServer}, etcd.ClientOptions{})
 	if err != nil {
 		return nil, err
 	}
 
-	registrar := sdetcd.NewRegistrar(client, sdetcd.Service{
+	registrar := etcd.NewRegistrar(client, etcd.Service{
 		Key:   key,
 		Value: instance,
 	}, logger)

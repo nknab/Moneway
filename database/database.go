@@ -18,9 +18,11 @@ package database
 import (
 	"database/sql"
 	"fmt"
+	"log"
 
 	"github.com/BurntSushi/toml"
 	_ "github.com/go-sql-driver/mysql"
+	"golang.org/x/net/context"
 )
 
 type Config struct {
@@ -53,56 +55,44 @@ func Init() {
 
 	db, _ = sql.Open("mysql", connString)
 
-	defer db.Close()
-	fmt.Println("Go MySQL Tutorial")
+	fmt.Println("Database Is Connected")
 }
 
 /**
  * @brief This Inserts Into The Database
  *
+ * @param ctx context.Context //Context
  * @param table string //The table you want to access.
  * @param columns []string //The Columns you want to insert the data.
  * @param values []string //The data to inserted.
  *
  * @return bool
  */
-func Insert(table string, columns []string, values []string) bool {
+func Insert(ctx context.Context, table string, columns []string, values []string) bool {
 	success := true
-	sql := "INSERT INTO " + table + "("
+	sqlStmt := "INSERT INTO " + table + "("
 	questionMarks := "("
 	count := 0
 	for _, column := range columns {
 		if count != len(columns)-1 {
-			sql += "" + column + ", "
+			sqlStmt += "" + column + ", "
 			questionMarks += "?, "
 		} else {
-			sql += "" + column + ") VALUES"
+			sqlStmt += "" + column + ") VALUES"
 			questionMarks += "?)"
 		}
 		count++
 	}
+	sqlStmt += questionMarks
+	fmt.Println(sqlStmt)
 
-	sql += questionMarks
+	args := make([]interface{}, len(values))
+	for i := range values {
+		args[i] = values[i]
+	}
 
-	tx, err := db.Begin()
-	if err != nil {
-		success = false
-		fmt.Println(err)
-	}
-	defer tx.Rollback()
-	fmt.Println(sql)
-	stmt, err := tx.Prepare(sql)
-	if err != nil {
-		success = false
-		fmt.Println(err)
-	}
-	defer stmt.Close()
-
-	_, err = stmt.Exec(values[:])
-	if err != nil {
-		success = false
-		fmt.Println(err)
-	}
+	_, err := db.ExecContext(ctx, sqlStmt, args...)
+	success = checkError(err)
 
 	return success
 }
@@ -110,59 +100,78 @@ func Insert(table string, columns []string, values []string) bool {
 /**
  * @brief This Gets Data From The Database
  *
+ * @param ctx context.Context //Context
  * @param table string //The table you want to access
  * @param condition []string //The Condition that must hold.
  *
  * @return string
  */
-func Select(table string, condition []string) string {
-	sql := "SELECT * FROM " + table + " WHERE `" + condition[0] + "` = ?"
+func Select(ctx context.Context, table string, condition []string) string {
 
-	fmt.Println(sql)
+	var id = condition[1]
+	sqlStmt := "select balance from " + table + " where " + condition[0] + " = ?"
+	fmt.Println(sqlStmt)
 
-	data, err := db.Query(sql, 1)
+	var balance string
+	stmt, err := db.PrepareContext(ctx, sqlStmt)
 	if err != nil {
-		success = false
-		fmt.Println(err)
+		log.Fatal(err)
 	}
-	defer data.Close()
+	err = stmt.QueryRow(id).Scan(&balance)
+	checkError(err)
 
-	return data
+	return balance
 }
 
 /**
  * @brief This Update A Column in A Table Data From The Database
  *
+ * @param ctx context.Context //Context
  * @param table string //The table you want to access
- * @param columns []string //The Columns you want to insert the data
+ * @param params []string //The Columns you want to insert the data
  *
  * @return bool
  */
-func Update(table string, condition []string) bool {
+func Update(ctx context.Context, table string, params []string) bool {
 	success := true
-	// sql := "UPDATE " + table + " SET `" + condition[0] + "` = ? WHERE " + condition[2] = " ?"
+	sqlStmt := "UPDATE " + table + " SET " + params[2] + " = ? WHERE " + params[0] + " = ?"
 
-	// fmt.Println(sql)
-
-	// data, err := db.Query(sql, 1)
-	// if err != nil {
-	// 	success = false
-	// 	fmt.Println(err)
-	// }
-	// defer data.Close()
-	// fmt.Println(data)
+	_, err := db.ExecContext(ctx, sqlStmt, params[3], params[1])
+	success = checkError(err)
 
 	return success
 }
 
-//func main(){
-//	Init()
-//	table := "account"
-//	columns := []string{"firstname", "lastname", "balance", "currency"}
-//	values := []string{"Tassie", "Antwi-Donkor", "5000", "USD"}
-//
-//	Insert(table, columns, values)
-//
-//	conditions := []string{"account_id", "1"}
-//	Select(table, conditions)
-//}
+/**
+ * @brief This Checks if there is an error
+ *
+ * @param error err //The error
+ *
+ * @return bool
+ */
+func checkError(err error) bool {
+	success := true
+	if err != nil {
+		success = false
+		log.Fatal(err)
+	}
+	return success
+}
+
+// This is for testing out the various functions
+// func main() {
+// 	ctx, stop := context.WithCancel(context.Background())
+// 	defer stop()
+// 	Init()
+// 	table := "account"
+
+// 	columns := []string{"firstname", "lastname", "balance", "currency"}
+// 	values := []string{"Tassie", "Antwi-Donkor", "5000", "USD"}
+// 	Insert(ctx, table, columns, values)
+
+// 	conditions := []string{"account_id", "1"}
+// 	Select(ctx, table, conditions)
+
+// 	params := []string{"account_id", "1", "balance", "2690.90"}
+// 	Update(ctx, table, params)
+// }
