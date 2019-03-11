@@ -1,4 +1,5 @@
-# Moneway v1.0
+# Moneway
+### Version 1.0
 This is an intern assessment for the position of a go developper at Moneway.
 
 This is a simulation of a transaction and update of a balance. There are two services, "balance" and "transaction". The "balance" service is responsible for handling the balance within the database, and the "transaction" service is responsible for updating the balance (by contacting the balance service) and storing the transaction data.
