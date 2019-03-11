@@ -3,8 +3,8 @@ package grpc
 
 import (
 	grpc "github.com/go-kit/kit/transport/grpc"
-	endpoint "github.com/nknab/MonewayV1.0/balance/pkg/endpoint"
-	pb "github.com/nknab/MonewayV1.0/balance/pkg/grpc/pb"
+	endpoint "github.com/nknab/Moneway/balance/pkg/endpoint"
+	pb "github.com/nknab/Moneway/balance/pkg/grpc/pb"
 )
 
 // NewGRPCServer makes a set of endpoints available as a gRPC AddServer

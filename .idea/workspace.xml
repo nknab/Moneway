@@ -30,7 +30,7 @@
     <select />
   </component>
   <component name="FavoritesManager">
-    <favorites_list name="MonewayV1.0" />
+    <favorites_list name="Moneway" />
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
@@ -99,8 +99,8 @@
         <subPane>
           <expand>
             <path>
-              <item name="MonewayV1.0" type="b2602c69:ProjectViewProjectNode" />
-              <item name="MonewayV1.0" type="462c0819:PsiDirectoryNode" />
+              <item name="Moneway" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Moneway" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />

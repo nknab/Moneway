@@ -3,7 +3,7 @@ package endpoint
 
 import (
 	endpoint "github.com/go-kit/kit/endpoint"
-	service "github.com/nknab/MonewayV1.0/balance/pkg/service"
+	service "github.com/nknab/Moneway/balance/pkg/service"
 )
 
 // Endpoints collects all of the endpoints that compose a profile service. It's

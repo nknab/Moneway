@@ -7,9 +7,9 @@ import (
 	prometheus "github.com/go-kit/kit/metrics/prometheus"
 	opentracing "github.com/go-kit/kit/tracing/opentracing"
 	http "github.com/go-kit/kit/transport/http"
-	endpoint "github.com/nknab/MonewayV1.0/transactions/pkg/endpoint"
-	http1 "github.com/nknab/MonewayV1.0/transactions/pkg/http"
-	service "github.com/nknab/MonewayV1.0/transactions/pkg/service"
+	endpoint "github.com/nknab/Moneway/transactions/pkg/endpoint"
+	http1 "github.com/nknab/Moneway/transactions/pkg/http"
+	service "github.com/nknab/Moneway/transactions/pkg/service"
 	group "github.com/oklog/oklog/pkg/group"
 	opentracinggo "github.com/opentracing/opentracing-go"
 )

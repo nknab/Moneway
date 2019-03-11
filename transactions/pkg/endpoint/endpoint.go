@@ -3,7 +3,7 @@ package endpoint
 import (
 	"context"
 	endpoint "github.com/go-kit/kit/endpoint"
-	service "github.com/nknab/MonewayV1.0/transactions/pkg/service"
+	service "github.com/nknab/Moneway/transactions/pkg/service"
 )
 
 // TransctRequest collects the request parameters for the Transct method.

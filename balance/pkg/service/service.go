@@ -19,7 +19,7 @@ import (
 	"context"
 	"fmt"
 
-	db "github.com/nknab/MonewayV1.0/database"
+	db "github.com/nknab/Moneway/database"
 )
 
 // BalanceService describes the service.

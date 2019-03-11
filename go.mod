@@ -1,4 +1,4 @@
-module github.com/nknab/MonewayV1.0
+module github.com/nknab/Moneway
 
 go 1.12
 

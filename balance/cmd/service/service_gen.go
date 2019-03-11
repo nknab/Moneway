@@ -7,8 +7,8 @@ import (
 	prometheus "github.com/go-kit/kit/metrics/prometheus"
 	opentracing "github.com/go-kit/kit/tracing/opentracing"
 	grpc "github.com/go-kit/kit/transport/grpc"
-	endpoint "github.com/nknab/MonewayV1.0/balance/pkg/endpoint"
-	service "github.com/nknab/MonewayV1.0/balance/pkg/service"
+	endpoint "github.com/nknab/Moneway/balance/pkg/endpoint"
+	service "github.com/nknab/Moneway/balance/pkg/service"
 	group "github.com/oklog/oklog/pkg/group"
 	opentracinggo "github.com/opentracing/opentracing-go"
 )

@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	http1 "github.com/go-kit/kit/transport/http"
-	endpoint "github.com/nknab/MonewayV1.0/transactions/pkg/endpoint"
+	endpoint "github.com/nknab/Moneway/transactions/pkg/endpoint"
 	"net/http"
 )
 

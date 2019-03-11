@@ -23,8 +23,8 @@ import (
 
 	"github.com/go-kit/kit/sd/etcd"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/nknab/MonewayV1.0/balance/pkg/grpc/pb"
-	db "github.com/nknab/MonewayV1.0/database"
+	"github.com/nknab/Moneway/balance/pkg/grpc/pb"
+	db "github.com/nknab/Moneway/database"
 	"google.golang.org/grpc"
 )
 

@@ -3,7 +3,7 @@ package http
 
 import (
 	http "github.com/go-kit/kit/transport/http"
-	endpoint "github.com/nknab/MonewayV1.0/transactions/pkg/endpoint"
+	endpoint "github.com/nknab/Moneway/transactions/pkg/endpoint"
 	http1 "net/http"
 )
 

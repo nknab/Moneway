@@ -3,7 +3,7 @@ package endpoint
 import (
 	"context"
 	endpoint "github.com/go-kit/kit/endpoint"
-	service "github.com/nknab/MonewayV1.0/balance/pkg/service"
+	service "github.com/nknab/Moneway/balance/pkg/service"
 )
 
 // GetBalanceRequest collects the request parameters for the GetBalance method.
