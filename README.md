@@ -39,12 +39,4 @@ In order to execute code, Kindly follow these steps.
 ### Making A Transaction
 In order to make a Transaction Open a New terminal and run the following code:
       
-      curl -XPOST http://localhost:8801/transct -d '{"transaction": {
-      "AccountID" : "1", 
-      "Description" : "This is a test",
-      "Amount" : 350.00, 
-      "Currency" : "Euro"}}'    
-
-
-## Future Works
-Build a more roboust system with regards to security.
+      curl -XPOST http://localhost:8801/transct -d '{"transaction": {"AccountID" : "1", "Description" : "This is a test", "Amount" : 350.00, "Currency" : "Euro", "TransactionType" : "CREDIT"}}'
