@@ -43,7 +43,8 @@ In order to make a Transaction Open a New terminal and run the following code:
       "AccountID" : "1", 
       "Description" : "This is a test",
       "Amount" : 350.00, 
-      "Currency" : "Euro"}}'    
+      "Currency" : "Euro"
+      "TransactionType" : "CREDIT"}}'    
 
 
 ## Future Works
