@@ -24,7 +24,7 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/nknab/MonewayV1.0/balance/pkg/grpc/pb"
-	db "github.com/nknab/MonewayV1.0/database/database"
+	db "github.com/nknab/MonewayV1.0/database"
 	"google.golang.org/grpc"
 )
 
@@ -57,11 +57,11 @@ func (b *basicTransactionsService) Transct(ctx context.Context, transaction Tran
 	//Converting the Value to a float32
 	value, err := strconv.ParseFloat(va, 32)
 	var oldBalance = float32(value)
-	var newBalance float32  = 0.0
+	var newBalance float32 = 0.0
 
 	table := "transactions"
 	columns := []string{"account_id", "description", "amount", "old_balance", "new_balance", "currency"}
-	values := []string{transaction.AccountID, transaction.Description, fmt.Sprintf("%f", transaction.Amount) , fmt.Sprintf("%f", oldBalance), fmt.Sprintf("%f", newBalance), transaction.Currency}
+	values := []string{transaction.AccountID, transaction.Description, fmt.Sprintf("%f", transaction.Amount), fmt.Sprintf("%f", oldBalance), fmt.Sprintf("%f", newBalance), transaction.Currency}
 
 	// Checking If It is a Debit Or A Credit
 	if transaction.TransactionType == 0 {
@@ -91,13 +91,28 @@ func (b *basicTransactionsService) Transct(ctx context.Context, transaction Tran
 
 // NewBasicTransactionsService returns a naive, stateless implementation of TransactionsService.
 func NewBasicTransactionsService() TransactionsService {
-	conn, err := grpc.Dial("Balance:8081", grpc.WithInsecure())
+	var etcdServer = "http://etcd:2379"
+
+	client, err := sdetcd.NewClient(context.Background(), []string{etcdServer}, sdetcd.ClientOptions{})
 	if err != nil {
-		log.Printf("unable to connect to balance: %s", err.Error())
+		log.Printf("Not able to connect to etcd: %s", err.Error())
 		return new(basicTransactionsService)
 	}
 
-	log.Printf("connected to balance")
+	entries, err := client.GetEntries("/services/balance/")
+	if err != nil || len(entries) == 0 {
+		log.Printf("Not able to get prefix entries: %s", err.Error())
+		return new(basicTransactionsService)
+	}
+
+	conn, err := grpc.Dial(entries[0], grpc.WithInsecure())
+
+	if err != nil {
+		log.Printf("Not Able to Connect to Balance: %s", err.Error())
+		return new(basicTransactionsService)
+	}
+
+	log.Printf("Connected to balance")
 
 	return &basicTransactionsService{
 		balanceServiceClient: pb.NewBalanceClient(conn),

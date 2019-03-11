@@ -18,7 +18,7 @@ package service
 import (
 	"context"
 
-	db "github.com/nknab/MonewayV1.0/database/database"
+	db "github.com/nknab/MonewayV1.0/database"
 )
 
 // BalanceService describes the service.
