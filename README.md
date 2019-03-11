@@ -27,14 +27,13 @@ In the **config/config.toml** file you will find the configuration file for the 
 The database schema could be found in the **moneway.sql** file
 
 
-## Executing The Code
-In order to execute code, Kindly follow these steps.
-1. Open a terminal and execute the following code:
-``docker-compose up -d etcd ``
-2. In the Same terminal execute:
-``docker-compose up -d balance``
-3. Open another terminal and execute:
-``docker-compose up -d transactions``
+## Building and Running
+In order to build and run code,open a terminal in the **MonewayV1.0 Directory** and execute the following code:
+1. ``docker-compose up -d etcd ``
+2. ``docker-compose up -d balance``
+3. ``docker-compose up -d transactions``
+4. ``docker-compose up --build``
+      
 
 ### Making A Transaction
 In order to make a Transaction Open a New terminal and run the following code:
