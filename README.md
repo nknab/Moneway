@@ -37,8 +37,20 @@ In order to build and run code,open a terminal in the **MonewayV1.0 Directory** 
       
 
 ### Making A Transaction
-In order to make a Transaction Open a New terminal and run the following code:
+Structure of Transaction Object
+
+      "transaction": {
+            "AccountID" : "1", 
+            "Description" : "This is a test", 
+            "Amount" : 350.00, 
+            "Currency" : "Euro", 
+            "TransactionType" : "CREDIT"
+      }
       
+TransactionType can be either **CREDIT** or **DEBIT**
+
+In order to make a Transaction Open a New terminal and run the following code:
+
       curl -XPOST http://localhost:8801/transct -d '{"transaction": {"AccountID" : "1", "Description" : "This is a test", "Amount" : 350.00, "Currency" : "Euro", "TransactionType" : "CREDIT"}}'
       
  ## Future Works
