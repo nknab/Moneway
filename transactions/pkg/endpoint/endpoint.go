@@ -2,6 +2,7 @@ package endpoint
 
 import (
 	"context"
+
 	endpoint "github.com/go-kit/kit/endpoint"
 	service "github.com/nknab/Moneway/transactions/pkg/service"
 )
@@ -13,15 +14,16 @@ type TransctRequest struct {
 
 // TransctResponse collects the response parameters for the Transct method.
 type TransctResponse struct {
-	E0 error `json:"e0"`
+	Status string `json:"status"`
+	E0     error  `json:"e0"`
 }
 
 // MakeTransctEndpoint returns an endpoint that invokes Transct on the service.
 func MakeTransctEndpoint(s service.TransactionsService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(TransctRequest)
-		e0 := s.Transct(ctx, req.Transaction)
-		return TransctResponse{E0: e0}, nil
+		status, e0 := s.Transct(ctx, req.Transaction)
+		return TransctResponse{Status: status, E0: e0}, nil
 	}
 }
 

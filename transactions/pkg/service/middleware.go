@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+
 	log "github.com/go-kit/kit/log"
 )
 
@@ -22,9 +23,9 @@ func LoggingMiddleware(logger log.Logger) Middleware {
 
 }
 
-func (l loggingMiddleware) Transct(ctx context.Context, transaction Transaction) (e0 error) {
+func (l loggingMiddleware) Transct(ctx context.Context, transaction Transaction) (string, error) {
 	defer func() {
-		l.logger.Log("method", "Transct", "transaction", transaction, "e0", e0)
+		l.logger.Log("method", "Transct", "transaction", transaction)
 	}()
 	return l.next.Transct(ctx, transaction)
 }

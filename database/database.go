@@ -120,7 +120,6 @@ func Select(ctx context.Context, table string, condition []string) string {
 	}
 	err = stmt.QueryRow(id).Scan(&column)
 	checkError(err)
-	fmt.Println("DB: ", column)
 
 	return column
 }

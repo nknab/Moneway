@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Mar 11, 2019 at 09:19 AM
+-- Generation Time: Mar 12, 2019 at 08:56 AM
 -- Server version: 10.1.37-MariaDB
 -- PHP Version: 7.3.0
 
@@ -32,7 +32,7 @@ CREATE TABLE `account` (
   `account_id` int(11) NOT NULL,
   `firstname` varchar(25) NOT NULL,
   `lastname` varchar(25) NOT NULL,
-  `balance` double NOT NULL,
+  `balance` float NOT NULL,
   `currency` varchar(25) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -43,7 +43,8 @@ CREATE TABLE `account` (
 --
 
 INSERT INTO `account` (`account_id`, `firstname`, `lastname`, `balance`, `currency`, `created_at`, `updated_at`) VALUES
-(1, 'Kojo', 'Anyinam-Boateng', 25000, 'Euro', '2019-03-10 14:29:23', '2019-03-10 14:29:23');
+(1, 'Kojo', 'Anyinam-Boateng', 7241.58, 'Euro', '2019-03-10 14:29:23', '2019-03-10 14:29:23'),
+(2, 'Tassie', 'Antwi-Donkor', 5000, 'USD', '2019-03-11 17:49:20', '2019-03-11 17:49:20');
 
 -- --------------------------------------------------------
 
@@ -55,13 +56,20 @@ CREATE TABLE `transactions` (
   `transaction_id` int(11) NOT NULL,
   `account_id` int(11) NOT NULL,
   `description` varchar(255) NOT NULL,
-  `amount` double NOT NULL,
-  `old_balance` double NOT NULL,
-  `new_balance` double NOT NULL,
+  `amount` float NOT NULL,
+  `old_balance` float NOT NULL,
+  `new_balance` float NOT NULL,
   `currency` varchar(25) NOT NULL,
   `transaction_type` enum('DEBIT','CREDIT') NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `transactions`
+--
+
+INSERT INTO `transactions` (`transaction_id`, `account_id`, `description`, `amount`, `old_balance`, `new_balance`, `currency`, `transaction_type`, `created_at`) VALUES
+(1, 1, 'This is a test', 350.34, 6891.24, 7241.58, 'Euro', 'CREDIT', '2019-03-12 07:55:23');
 
 --
 -- Indexes for dumped tables
@@ -88,13 +96,13 @@ ALTER TABLE `transactions`
 -- AUTO_INCREMENT for table `account`
 --
 ALTER TABLE `account`
-  MODIFY `account_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `account_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `transactions`
 --
 ALTER TABLE `transactions`
-  MODIFY `transaction_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `transaction_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- Constraints for dumped tables

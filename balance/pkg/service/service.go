@@ -17,7 +17,6 @@ package service
 
 import (
 	"context"
-	"fmt"
 
 	db "github.com/nknab/Moneway/database"
 )
@@ -39,12 +38,11 @@ func (b *basicBalanceService) GetBalance(ctx context.Context, accountID string) 
 	conditions := []string{"account_id", accountID, "balance"}
 	balance := db.Select(ctx, table, conditions)
 
-	fmt.Println("SB: ", balance)
 	return balance, nil
 }
 func (b *basicBalanceService) UpdateBalance(ctx context.Context, accountID string, amount string) (string, error) {
 	// TODO implement the business logic of UpdateBalance
-
+	state := "false"
 	//Initializing the Database package
 	db.Init()
 	table := "account"
@@ -54,11 +52,9 @@ func (b *basicBalanceService) UpdateBalance(ctx context.Context, accountID strin
 	success := db.Update(ctx, table, params)
 
 	if success == true {
-		fmt.Println("Update was Successful, Current Balance Is ", amount)
-	} else {
-		fmt.Println("Update was Unsuccessful")
+		state = "true"
 	}
-	return "", nil
+	return state, nil
 }
 
 // NewBasicBalanceService returns a naive, stateless implementation of BalanceService.

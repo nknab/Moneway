@@ -40,14 +40,14 @@ type Transaction struct {
 // TransactionsService describes the service.
 type TransactionsService interface {
 	// Add your methods here
-	Transct(ctx context.Context, transaction Transaction) error
+	Transct(ctx context.Context, transaction Transaction) (string, error)
 }
 
 type basicTransactionsService struct {
 	balanceServiceClient pb.BalanceClient
 }
 
-func (b *basicTransactionsService) Transct(ctx context.Context, transaction Transaction) (e0 error) {
+func (b *basicTransactionsService) Transct(ctx context.Context, transaction Transaction) (string, error) {
 	// TODO implement the business logic of Transct
 	ctx, stop := context.WithCancel(context.Background())
 	defer stop()
@@ -77,19 +77,26 @@ func (b *basicTransactionsService) Transct(ctx context.Context, transaction Tran
 	columns := []string{"account_id", "description", "amount", "old_balance", "new_balance", "currency", "transaction_type"}
 	values := []string{transaction.AccountID, transaction.Description, fmt.Sprintf("%f", transaction.Amount), fmt.Sprintf("%f", oldBalance), fmt.Sprintf("%f", newBalance), transaction.Currency, transaction.TransactionType}
 
+	funcState := "false"
+	stateStatus := "Status: Transaction Was Unsuccessful."
 	// Checking if there is enough Funds in the account before performing transaction
 	if newBalance >= 0.0 {
 		db.Insert(ctx, table, columns, values)
 		//Updating the balance via the balance service.
-		b.balanceServiceClient.UpdateBalance(context.Background(), &pb.UpdateBalanceRequest{
+		state, _ := b.balanceServiceClient.UpdateBalance(context.Background(), &pb.UpdateBalanceRequest{
 			AccountID: transaction.AccountID,
 			Amount:    fmt.Sprintf("%f", newBalance),
 		})
-	} else {
-		fmt.Println("Not Enough Funds in Account")
+		funcState = state.Success
 	}
 
-	return e0
+	if funcState == "true" {
+		stateStatus = "Status: Transaction Was Successful. Old Balance was: " + fmt.Sprintf("%.2f", oldBalance) + ". Current Balance is: " + fmt.Sprintf("%.2f", newBalance)
+	} else if newBalance < 0.0 {
+		stateStatus = "Status: Transaction Was Unsuccessful. Not Enough Funds in Account"
+	}
+
+	return stateStatus, nil
 }
 
 // NewBasicTransactionsService returns a naive, stateless implementation of TransactionsService.
