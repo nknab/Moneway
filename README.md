@@ -33,8 +33,7 @@ In order to build and run code,open a terminal in the **MonewayV1.0 Directory** 
 1. ``docker-compose up -d etcd ``
 2. ``docker-compose up -d balance``
 3. ``docker-compose up -d transactions``
-4. ``docker-compose up --build``
-5. ``docker-compose up``
+4. ``docker-compose up``
       
 
 ### Making A Transaction
