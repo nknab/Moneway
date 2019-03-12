@@ -18,7 +18,7 @@ This makes use of MySql Database
 
 In the **config/config.toml** file you will find the configuration file for the Database. Make changes to suit your database settings. 
 
-      server = "127.0.0.1"
+      server = "docker.for.mac.localhost"
       port = "3306"
       database = "moneway"
       user = "your username"
