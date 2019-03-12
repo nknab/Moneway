@@ -53,7 +53,9 @@ func Init() {
 	}
 	connString := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", config.Database.User, config.Database.Password, config.Database.Server, config.Database.Port, config.Database.Database)
 
-	db, _ = sql.Open("mysql", connString)
+	dbConn, err := sql.Open("mysql", connString)
+	checkError(err)
+	db = dbConn
 
 	fmt.Println("Database Is Connected")
 }
@@ -84,7 +86,6 @@ func Insert(ctx context.Context, table string, columns []string, values []string
 		count++
 	}
 	sqlStmt += questionMarks
-	fmt.Println(sqlStmt)
 
 	args := make([]interface{}, len(values))
 	for i := range values {
@@ -109,18 +110,19 @@ func Insert(ctx context.Context, table string, columns []string, values []string
 func Select(ctx context.Context, table string, condition []string) string {
 
 	var id = condition[1]
-	sqlStmt := "select balance from " + table + " where " + condition[0] + " = ?"
+	sqlStmt := "select " + condition[2] + " from " + table + " where " + condition[0] + " = ?"
 	fmt.Println(sqlStmt)
 
-	var balance string
+	var column string
 	stmt, err := db.PrepareContext(ctx, sqlStmt)
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = stmt.QueryRow(id).Scan(&balance)
+	err = stmt.QueryRow(id).Scan(&column)
 	checkError(err)
+	fmt.Println("DB: ", column)
 
-	return balance
+	return column
 }
 
 /**

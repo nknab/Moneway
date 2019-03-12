@@ -37,6 +37,7 @@ require (
 	github.com/opentracing/basictracer-go v1.0.0 // indirect
 	github.com/openzipkin-contrib/zipkin-go-opentracing v0.3.5 // indirect
 	github.com/openzipkin/zipkin-go v0.1.5 // indirect
+	github.com/openzipkin/zipkin-go-opentracing v0.3.5 // indirect
 	github.com/pborman/uuid v1.2.0 // indirect
 	github.com/performancecopilot/speed v3.0.0+incompatible // indirect
 	github.com/pkg/errors v0.8.1 // indirect

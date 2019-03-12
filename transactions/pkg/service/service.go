@@ -19,6 +19,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"math"
 	"strconv"
 
 	"github.com/go-kit/kit/sd/etcd"
@@ -55,16 +56,14 @@ func (b *basicTransactionsService) Transct(ctx context.Context, transaction Tran
 	db.Init()
 
 	//This value will comes from the balance service.
-	va := pb.GetBalanceRequest{AccountID: transaction.AccountID}.AccountID
+	bal, _ := b.balanceServiceClient.GetBalance(context.Background(), &pb.GetBalanceRequest{
+		AccountID: transaction.AccountID,
+	})
 
 	//Converting the Value to a float32
-	value, err := strconv.ParseFloat(va, 32)
-	var oldBalance = float32(value)
+	value, _ := strconv.ParseFloat(bal.Amount, 64)
+	var oldBalance = float32(math.Round(value*100) / 100)
 	var newBalance float32 = 0.0
-
-	table := "transactions"
-	columns := []string{"account_id", "description", "amount", "old_balance", "new_balance", "currency", "transaction_type"}
-	values := []string{transaction.AccountID, transaction.Description, fmt.Sprintf("%f", transaction.Amount), fmt.Sprintf("%f", oldBalance), fmt.Sprintf("%f", newBalance), transaction.Currency, transaction.TransactionType}
 
 	// Checking If It is a Debit Or A Credit
 	if transaction.TransactionType == "DEBIT" {
@@ -73,11 +72,19 @@ func (b *basicTransactionsService) Transct(ctx context.Context, transaction Tran
 		newBalance = oldBalance + transaction.Amount
 	}
 
+	// Data for entry
+	table := "transactions"
+	columns := []string{"account_id", "description", "amount", "old_balance", "new_balance", "currency", "transaction_type"}
+	values := []string{transaction.AccountID, transaction.Description, fmt.Sprintf("%f", transaction.Amount), fmt.Sprintf("%f", oldBalance), fmt.Sprintf("%f", newBalance), transaction.Currency, transaction.TransactionType}
+
 	// Checking if there is enough Funds in the account before performing transaction
 	if newBalance >= 0.0 {
 		db.Insert(ctx, table, columns, values)
 		//Updating the balance via the balance service.
-		_ = pb.UpdateBalanceRequest{AccountID: transaction.AccountID, Amount: fmt.Sprintf("%f", newBalance)}
+		b.balanceServiceClient.UpdateBalance(context.Background(), &pb.UpdateBalanceRequest{
+			AccountID: transaction.AccountID,
+			Amount:    fmt.Sprintf("%f", newBalance),
+		})
 	} else {
 		fmt.Println("Not Enough Funds in Account")
 	}

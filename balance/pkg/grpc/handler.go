@@ -2,7 +2,7 @@ package grpc
 
 import (
 	"context"
-	"errors"
+
 	grpc "github.com/go-kit/kit/transport/grpc"
 	endpoint "github.com/nknab/Moneway/balance/pkg/endpoint"
 	pb "github.com/nknab/Moneway/balance/pkg/grpc/pb"

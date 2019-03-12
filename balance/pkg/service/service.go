@@ -36,9 +36,10 @@ func (b *basicBalanceService) GetBalance(ctx context.Context, accountID string) 
 	//Initializing the Database package
 	db.Init()
 	table := "account"
-	conditions := []string{"account_id", accountID}
+	conditions := []string{"account_id", accountID, "balance"}
 	balance := db.Select(ctx, table, conditions)
 
+	fmt.Println("SB: ", balance)
 	return balance, nil
 }
 func (b *basicBalanceService) UpdateBalance(ctx context.Context, accountID string, amount string) (string, error) {

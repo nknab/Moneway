@@ -2,6 +2,7 @@ package endpoint
 
 import (
 	"context"
+
 	endpoint "github.com/go-kit/kit/endpoint"
 	service "github.com/nknab/Moneway/balance/pkg/service"
 )
@@ -14,7 +15,7 @@ type GetBalanceRequest struct {
 // GetBalanceResponse collects the response parameters for the GetBalance method.
 type GetBalanceResponse struct {
 	Balance string `json:"balance"`
-	E1 error  `json:"e1"`
+	E1      error  `json:"e1"`
 }
 
 // MakeGetBalanceEndpoint returns an endpoint that invokes GetBalance on the service.
@@ -24,7 +25,7 @@ func MakeGetBalanceEndpoint(s service.BalanceService) endpoint.Endpoint {
 		balance, e1 := s.GetBalance(ctx, req.AccountID)
 		return GetBalanceResponse{
 			Balance: balance,
-			E1: e1,
+			E1:      e1,
 		}, nil
 	}
 }
@@ -43,7 +44,7 @@ type UpdateBalanceRequest struct {
 // UpdateBalanceResponse collects the response parameters for the UpdateBalance method.
 type UpdateBalanceResponse struct {
 	Success string `json:"success"`
-	E1 error  `json:"e1"`
+	E1      error  `json:"e1"`
 }
 
 // MakeUpdateBalanceEndpoint returns an endpoint that invokes UpdateBalance on the service.
@@ -53,7 +54,7 @@ func MakeUpdateBalanceEndpoint(s service.BalanceService) endpoint.Endpoint {
 		success, e1 := s.UpdateBalance(ctx, req.AccountID, req.Amount)
 		return UpdateBalanceResponse{
 			Success: success,
-			E1: e1,
+			E1:      e1,
 		}, nil
 	}
 }
@@ -75,7 +76,7 @@ func (e Endpoints) GetBalance(ctx context.Context, accountID string) (string, er
 	request := GetBalanceRequest{AccountID: accountID}
 	response, err := e.GetBalanceEndpoint(ctx, request)
 	if err != nil {
-		return
+		return "", nil
 	}
 	return response.(GetBalanceResponse).Balance, nil
 }
@@ -88,7 +89,7 @@ func (e Endpoints) UpdateBalance(ctx context.Context, accountID string, amount s
 	}
 	response, err := e.UpdateBalanceEndpoint(ctx, request)
 	if err != nil {
-		return
+		return "", nil
 	}
 	return response.(UpdateBalanceResponse).Success, nil
 }

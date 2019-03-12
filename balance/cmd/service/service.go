@@ -21,7 +21,7 @@ import (
 	service "github.com/nknab/Moneway/balance/pkg/service"
 	group "github.com/oklog/oklog/pkg/group"
 	opentracinggo "github.com/opentracing/opentracing-go"
-	zipkingoopentracing "github.com/openzipkin/zipkin-go-opentracing"
+	zipkingoopentracing "github.com/openzipkin-contrib/zipkin-go-opentracing"
 	prometheus1 "github.com/prometheus/client_golang/prometheus"
 	promhttp "github.com/prometheus/client_golang/prometheus/promhttp"
 	grpc1 "google.golang.org/grpc"
@@ -169,8 +169,8 @@ func initCancelInterrupt(g *group.Group) {
 func registerService(logger log.Logger) (*etcd.Registrar, error) {
 	var (
 		etcdServer = "http://etcd:2379"
-		prefix     = "/services/transactions/"
-		instance   = "transactions:8081"
+		prefix     = "/services/balance/"
+		instance   = "balance:8082"
 		key        = prefix + instance
 	)
 
@@ -185,7 +185,6 @@ func registerService(logger log.Logger) (*etcd.Registrar, error) {
 	}, logger)
 
 	registrar.Register()
-	logger.log("Balanced Register ETCD")
 
 	return registrar, nil
 }
