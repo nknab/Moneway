@@ -29,11 +29,9 @@ The database schema could be found in the **moneway.sql** file.
 
 
 ## Building and Running
-In order to build and run code,open a terminal in the **MonewayV1.0 Directory** and execute the following code:
-1. ``docker-compose up -d etcd ``
-2. ``docker-compose up -d balance``
-3. ``docker-compose up -d transactions``
-4. ``docker-compose up --build``
+In order to build and run code,open a terminal in the **MonewayV1.0 Directory** and execute the following command:
+ 
+      docker-compose up --build
       
 
 ### Making A Transaction
@@ -49,7 +47,7 @@ Structure of Transaction Object
       
 TransactionType can be either **CREDIT** or **DEBIT**
 
-In order to make a Transaction Open a New terminal and run the following code:
+In order to make a Transaction Open a New terminal and run the following command:
 
       curl -XPOST http://localhost:8801/transct -d '{"transaction": {"AccountID" : "1", "Description" : "This is a test", "Amount" : 350.00, "Currency" : "Euro", "TransactionType" : "CREDIT"}}'
       
