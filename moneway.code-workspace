@@ -1,8 +1,33 @@
 {
-	"folders": [
-		{
-			"path": "."
+	"folders": [{
+		"path": "."
+	}],
+	"settings": {
+		"psi-header.variables": [
+			["authoremail", "kojo.anyinam-boateng@outlook.com"],
+			["prname", "Moneway Go Developper Intern Challenge"],
+		],
+		"psi-header.templates": [{
+			"language": "*",
+			"template": [
+				"File: <<filename>>",
+				"Project: <<prname>>",
+				"File Created: <<filecreated('dddd, Do MMMM YYYY h:mm:ss A')>>",
+				"Author: <<author>>",
+				"Email: <<authoremail>>",
+				"Version: 1.1",
+				"Brief: ",
+				"-----",
+				"Last Modified: <<dateformat('dddd, Do MMMM YYYY h:mm:ss A')>>",
+				"Modified By: <<author>>",
+				"-----",
+				"Copyright ©<<year>> <<author>>",
+			]
 		}
 	],
-	"settings": {}
+	"cSpell.words": [
+		"Moneway",
+		"nknab"
+	],
+	}
 }

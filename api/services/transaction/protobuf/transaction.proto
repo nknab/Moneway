@@ -1,0 +1,36 @@
+/*
+ * File: transaction.proto
+ * Project: Moneway Go Developper Intern Challenge
+ * File Created: Friday, 15th March 2019 6:40:11 PM
+ * Author: nknab
+ * Email: kojo.anyinam-boateng@outlook.com
+ * Version: 1.1
+ * Brief: 
+ * -----
+ * Last Modified: Friday, 15th March 2019 6:40:23 PM
+ * Modified By: nknab
+ * -----
+ * Copyright ©2019 nknab
+ */
+
+syntax = "proto3";
+
+package transaction;
+
+message MakeTransaction {
+    int32 accountID = 1;
+    string description = 2;
+    double amount = 3;
+    string currency = 4;
+    string transactionType = 5;
+}
+
+message MakeTransactionReply {
+    bool success = 1;
+    int32 id = 2;
+    string msg = 3;
+}
+
+service Transaction {
+    rpc transact(MakeTransaction) returns (MakeTransactionReply);
+}

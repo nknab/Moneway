@@ -1,0 +1,41 @@
+/*
+ * File: balance.proto
+ * Project: Moneway Go Developper Intern Challenge
+ * File Created: Friday, 15th March 2019 6:35:29 PM
+ * Author: nknab
+ * Email: kojo.anyinam-boateng@outlook.com
+ * Version: 1.1
+ * Brief: 
+ * -----
+ * Last Modified: Friday, 15th March 2019 6:38:16 PM
+ * Modified By: nknab
+ * -----
+ * Copyright ©2019 nknab
+ */
+
+syntax = "proto3";
+
+package balance;
+
+message GetBalanceRequest {
+    int32 accountID = 1;
+}
+
+message GetBalanceReply {
+    bool success = 1;
+    double amount = 2;
+}
+
+message UpdateBalanceRequest {
+    int32 accountID = 1;
+    double amount = 2;
+}
+
+message UpdateBalanceReply {
+    bool success = 1;
+}
+
+service Balance {
+    rpc GetBalance(GetBalanceRequest) returns (GetBalanceReply);
+    rpc UpdateBalance(UpdateBalanceRequest) returns (UpdateBalanceReply);
+}
