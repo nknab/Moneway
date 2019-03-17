@@ -5,7 +5,7 @@
  * Author: nknab
  * Email: kojo.anyinam-boateng@outlook.com
  * Version: 1.1
- * Brief: 
+ * Brief: The structre of the balance service.
  * -----
  * Last Modified: Friday, 15th March 2019 6:38:16 PM
  * Modified By: nknab
@@ -17,24 +17,29 @@ syntax = "proto3";
 
 package balanceService;
 
+//The structure of a get balance request.
 message GetBalanceRequest {
     int32 accountID = 1;
 }
 
+//The structure of a reply after a get balance request has occurred.
 message GetBalanceReply {
     bool success = 1;
     double amount = 2;
 }
 
+//The structure of an update balance request.
 message UpdateBalanceRequest {
     int32 accountID = 1;
     double amount = 2;
 }
 
+//The structure of a reply after a balance update has occurred.
 message UpdateBalanceReply {
     bool success = 1;
 }
 
+//The Balance service.
 service Balance {
     rpc GetBalance(GetBalanceRequest) returns (GetBalanceReply);
     rpc UpdateBalance(UpdateBalanceRequest) returns (UpdateBalanceReply);

@@ -5,7 +5,7 @@
  * Author: nknab
  * Email: kojo.anyinam-boateng@outlook.com
  * Version: 1.1
- * Brief:
+ * Brief: This this Transaction Service class.
  * -----
  * Last Modified: Friday, 15th March 2019 7:02:16 PM
  * Modified By: nknab
@@ -16,27 +16,41 @@
 package main
 
 import (
-	//"context"
 	"context"
+	"database/sql"
 	"fmt"
-	"log"
 	"math"
 	"net"
+	"os"
 
-	"github.com/nknab/Moneway/api/services/balance/pb"
-	"github.com/nknab/Moneway/api/services/transaction/pb"
-	db "github.com/nknab/Moneway/database"
+	"github.com/joho/godotenv"
+
+	balanceService "github.com/nknab/Moneway/api/services/balance/pb"
+	transactionService "github.com/nknab/Moneway/api/services/transaction/pb"
+	"github.com/nknab/Moneway/database"
 	ut "github.com/nknab/Moneway/util"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
 
-var balanceClient balanceService.BalanceClient
+var (
+	balanceClient balanceService.BalanceClient
+	config        = "../../../config/config.env"
+	db            *sql.DB
+)
 
 type server struct{}
 
+/**
+ * @brief This gets a user's balance.
+ *
+ * @param ctx context.Context //Context
+ * @param transaction *transactionService.MakeTransaction // Reference to the MakeTransaction Object
+ *
+ * @return *transactionService.MakeTransactionReply
+ * @return error
+ */
 func (s *server) Transact(ctx context.Context, transaction *transactionService.MakeTransaction) (*transactionService.MakeTransactionReply, error) {
-	db.Init("../../../config/config.toml")
 	tempValue, _ := balanceClient.GetBalance(context.Background(), &balanceService.GetBalanceRequest{
 		AccountID: transaction.AccountID,
 	})
@@ -53,33 +67,39 @@ func (s *server) Transact(ctx context.Context, transaction *transactionService.M
 		newBalance = oldBalance + transaction.Amount
 	}
 
-	// Data for entry
+	// Data for transaction
 	table := "transactions"
 	columns := []string{"account_id", "description", "amount", "old_balance", "new_balance", "currency", "transaction_type"}
 	values := []string{ut.IntToString(transaction.AccountID), transaction.Description, ut.FloatToString(transaction.Amount), ut.FloatToString(oldBalance), ut.FloatToString(newBalance), transaction.Currency, transaction.TransactionType}
 
 	funcState := false
 	stateStatus := "Status: Transaction Was Unsuccessful."
+
+	var id int32
 	// Checking if there is enough Funds in the account before performing transaction
 	if newBalance >= 0.0 {
-		db.Insert(ctx, table, columns, values)
+		id, _ = database.Insert(ctx, table, columns, values, db)
 		//Updating the balance via the balance service.
 		state, _ := balanceClient.UpdateBalance(context.Background(), &balanceService.UpdateBalanceRequest{
 			AccountID: transaction.AccountID,
 			Amount:    newBalance,
 		})
 		funcState = state.Success
+	} else{
+		id = -1
 	}
 
+	//Checking to see of the transaction was successful.
 	if funcState == true {
 		stateStatus = "Status: Transaction Was Successful. Old Balance was: " + fmt.Sprintf("%.2f", oldBalance) + ". Current Balance is: " + fmt.Sprintf("%.2f", newBalance)
 	} else if newBalance < 0.0 {
 		stateStatus = "Status: Transaction Was Unsuccessful. Not Enough Funds in Account"
 	}
+	fmt.Println(id)
 
 	response := &transactionService.MakeTransactionReply{
 		Success: true,
-		Id:      2,
+		Id:      id,
 		Msg:     stateStatus,
 	}
 
@@ -87,17 +107,29 @@ func (s *server) Transact(ctx context.Context, transaction *transactionService.M
 }
 
 func main() {
+	var bport string
+	var tport string
 
-	balanceClient = balanceService.NewBalanceClient(ut.Connect(":8082", "Could not connect to :8082"))
+	//Initializing the database
+	db = database.Init(config)
 
-	transactionSrv, err := net.Listen("tcp", ":8081")
-	ut.CheckError(err, "Could not listen to TranactionServe on :8081")
+	//Reading in the configuration variables
+	err := godotenv.Load(config)
+	ut.CheckError(err, "Error loading config.env file")
+	bport = ":" + os.Getenv("BALANCE_PORT")
+	tport = ":" + os.Getenv("TRANSACTION_PORT")
 
+	//Connect to my balance service client.
+	balanceClient = balanceService.NewBalanceClient(ut.Connect(bport, "Could not connect to "+bport))
+
+	transactionSrv, err := net.Listen("tcp", tport)
+	ut.CheckError(err, "Could not listen to TranactionServe on "+tport)
+
+	//Declaring and initializing the gRPC server
 	srv := grpc.NewServer()
 	transactionService.RegisterTransactionServer(srv, &server{})
 	reflection.Register(srv)
 
-	if err = srv.Serve(transactionSrv); err != nil {
-		log.Fatalf("Could not connect to: %v", err)
-	}
+	err = srv.Serve(transactionSrv)
+	ut.CheckError(err, "Could not connect to transaction connect")
 }

@@ -1,13 +1,13 @@
 /*
  * File: database.go
  * Project: Moneway Go Developper Intern Challenge
- * File Created: Friday, 15th March 2019 7:47:33 PM
+ * File Created: Friday, 15th March 2019 7:48:11 PM
  * Author: nknab
  * Email: kojo.anyinam-boateng@outlook.com
  * Version: 1.1
- * Brief:
+ * Brief: This is the database class to handle all database queries.
  * -----
- * Last Modified: Friday, 15th March 2019 7:48:11 PM
+ * Last Modified: Sunday, 17th March 2019 8:10:57 PM
  * Modified By: nknab
  * -----
  * Copyright ©2019 nknab
@@ -18,45 +18,30 @@ package database
 import (
 	"database/sql"
 	"fmt"
-	"github.com/BurntSushi/toml"
+	"os"
+
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/joho/godotenv"
+	ut "github.com/nknab/Moneway/util"
 	"golang.org/x/net/context"
-	"log"
 )
-
-type Config struct {
-	Database database
-}
-
-type database struct {
-	Server   string
-	Port     string
-	Database string
-	User     string
-	Password string
-}
-
-var db *sql.DB
 
 /**
  * @brief This Initialize's the Database Instance.
  *
- * @param
+ * @param filePath string //File path to the env file.
  *
  * @return void
  */
-func Init(filePath string) {
-	var config Config
-	if _, err := toml.DecodeFile(filePath, &config); err != nil {
-		fmt.Println(err)
-	}
-	connString := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", config.Database.User, config.Database.Password, config.Database.Server, config.Database.Port, config.Database.Database)
+func Init(filePath string) *sql.DB {
+	err := godotenv.Load(filePath)
+	ut.CheckError(err, "Error loading config.env file")
+	connString := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_SERVER"), os.Getenv("DB_PORT"), os.Getenv("DB"))
 
 	dbConn, err := sql.Open("mysql", connString)
-	checkError(err)
-	db = dbConn
+	ut.CheckError(err, "Can not connect to Database")
 
-	fmt.Println("Database Is Connected")
+	return dbConn
 }
 
 /**
@@ -66,10 +51,12 @@ func Init(filePath string) {
  * @param table string //The table you want to access.
  * @param columns []string //The Columns you want to insert the data.
  * @param values []string //The data to inserted.
+ * @param db *sql.DB //A reference to a database instance.
  *
+ * @return int32
  * @return bool
  */
-func Insert(ctx context.Context, table string, columns []string, values []string) bool {
+func Insert(ctx context.Context, table string, columns []string, values []string, db *sql.DB) (int32, bool) {
 	success := true
 	sqlStmt := "INSERT INTO " + table + "("
 	questionMarks := "("
@@ -90,11 +77,23 @@ func Insert(ctx context.Context, table string, columns []string, values []string
 	for i := range values {
 		args[i] = values[i]
 	}
-	//fmt.Println(sqlStmt)
-	_, err := db.ExecContext(ctx, sqlStmt, args...)
-	success = checkError(err)
 
-	return success
+	_, err := db.ExecContext(ctx, sqlStmt, args...)
+	success = ut.CheckError(err, "Insert Query Could Not be Executed")
+
+	var id int32
+	//Getting the ID of the last insertion
+	if success {
+		sqlStmt = "select max(transaction_id) from " + table
+		stmt, err := db.PrepareContext(ctx, sqlStmt)
+		ut.CheckError(err, "Binding failed")
+		err = stmt.QueryRow().Scan(&id)
+		ut.CheckError(err, "Select Query Could Not be Executed")
+	} else {
+		id = -1
+	}
+
+	return id, success
 }
 
 /**
@@ -103,22 +102,20 @@ func Insert(ctx context.Context, table string, columns []string, values []string
  * @param ctx context.Context //Context
  * @param table string //The table you want to access
  * @param condition []string //The Condition that must hold.
+ * @param db *sql.DB //A reference to a database instance.
  *
  * @return string
  */
-func Select(ctx context.Context, table string, condition []string) string {
+func Select(ctx context.Context, table string, condition []string, db *sql.DB) string {
 
 	var id = condition[1]
 	sqlStmt := "select " + condition[2] + " from " + table + " where " + condition[0] + " = ?"
-	//fmt.Println(sqlStmt)
 
 	var column string
 	stmt, err := db.PrepareContext(ctx, sqlStmt)
-	if err != nil {
-		log.Fatal(err)
-	}
+	ut.CheckError(err, "Binding failed")
 	err = stmt.QueryRow(id).Scan(&column)
-	checkError(err)
+	ut.CheckError(err, "Select Query Could Not be Executed")
 
 	return column
 }
@@ -129,49 +126,16 @@ func Select(ctx context.Context, table string, condition []string) string {
  * @param ctx context.Context //Context
  * @param table string //The table you want to access
  * @param params []string //The Columns you want to insert the data
+ * @param db *sql.DB //A reference to a database instance.
  *
  * @return bool
  */
-func Update(ctx context.Context, table string, params []string) bool {
+func Update(ctx context.Context, table string, params []string, db *sql.DB) bool {
 	success := true
 	sqlStmt := "UPDATE " + table + " SET " + params[2] + " = ? WHERE " + params[0] + " = ?"
 
 	_, err := db.ExecContext(ctx, sqlStmt, params[3], params[1])
-	success = checkError(err)
+	success = ut.CheckError(err, "Update Query Could Not be Executed")
 
 	return success
 }
-
-/**
- * @brief This Checks if there is an error
- *
- * @param error err //The error
- *
- * @return bool
- */
-func checkError(err error) bool {
-	success := true
-	if err != nil {
-		success = false
-		log.Fatal(err)
-	}
-	return success
-}
-
-// This is for testing out the various functions
-// func main() {
-// 	ctx, stop := context.WithCancel(context.Background())
-// 	defer stop()
-// 	Init()
-// 	table := "account"
-
-// 	columns := []string{"firstname", "lastname", "balance", "currency"}
-// 	values := []string{"Tassie", "Antwi-Donkor", "5000", "USD"}
-// 	Insert(ctx, table, columns, values)
-
-// 	conditions := []string{"account_id", "1"}
-// 	Select(ctx, table, conditions)
-
-// 	params := []string{"account_id", "1", "balance", "2690.90"}
-// 	Update(ctx, table, params)
-// }

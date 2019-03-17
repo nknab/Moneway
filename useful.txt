@@ -23,5 +23,25 @@ docker container ls -a
 
 docker system prune
 
+source run.sh; transaction-server
+source run.sh; balance-server
+source run.sh; main-server
 
-Resp: %vrpc error: code = Unavailable desc = all SubConns are in TransientFailure, latest connection error: connection error: desc = "transport: Error while dialing dial tcp 127.0.0.1:8082: connect: connection refused"
+
+curl --request GET \
+  --url http://localhost:8080/getBalance/1 \
+  --header 'Postman-Token: eac0df1c-e1ad-4abf-86f9-acdc57630e0f' \
+  --header 'cache-control: no-cache'
+
+
+curl --request POST \
+  --url http://localhost:8080/transact \
+  --header 'Content-Type: application/json' \
+  --header 'Postman-Token: bbb9a987-81a5-4116-a40a-d062cfaa9a6c' \
+  --header 'cache-control: no-cache' \
+  --header 'content-type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW' \
+  --form AccountID=1 \
+  --form 'Description=This is Post Man' \
+  --form Amount=25 \
+  --form Currency=Euro \
+  --form TransactionType=CREDIT

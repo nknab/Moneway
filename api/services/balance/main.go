@@ -1,13 +1,13 @@
 /*
- * File: balance.go
+ * File: main.go
  * Project: Moneway Go Developper Intern Challenge
  * File Created: Friday, 15th March 2019 7:01:17 PM
  * Author: nknab
  * Email: kojo.anyinam-boateng@outlook.com
  * Version: 1.1
- * Brief:
+ * Brief: This this Balance Service class.
  * -----
- * Last Modified: Friday, 15th March 2019 7:02:10 PM
+ * Last Modified: Sunday, 17th March 2019 8:26:21 PM
  * Modified By: nknab
  * -----
  * Copyright ©2019 nknab
@@ -16,11 +16,14 @@
 package main
 
 import (
-	"log"
+	"database/sql"
+	"os"
 	"strconv"
 
-	"github.com/nknab/Moneway/api/services/balance/pb"
-	db "github.com/nknab/Moneway/database"
+	"github.com/joho/godotenv"
+
+	balanceService "github.com/nknab/Moneway/api/services/balance/pb"
+	"github.com/nknab/Moneway/database"
 	ut "github.com/nknab/Moneway/util"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
@@ -31,13 +34,25 @@ import (
 
 type server struct{}
 
-func (s *server) GetBalance(ctx context.Context, data *balanceService.GetBalanceRequest) (*balanceService.GetBalanceReply, error) {
+var (
+	config = "../../../config/config.env"
+	db     *sql.DB
+)
 
-	db.Init("../../../config/config.toml")
+/**
+ * @brief This gets a user's balance.
+ *
+ * @param ctx context.Context //Context
+ * @param data *balanceService.GetBalanceRequest // Reference to the GetBalanceRequest Object
+ *
+ * @return *balanceService.GetBalanceReply
+ * @return error
+ */
+func (s *server) GetBalance(ctx context.Context, data *balanceService.GetBalanceRequest) (*balanceService.GetBalanceReply, error) {
 	table := "account"
 
 	conditions := []string{"account_id", ut.IntToString(data.AccountID), "balance"}
-	balance := db.Select(ctx, table, conditions)
+	balance := database.Select(ctx, table, conditions, db)
 	value, _ := strconv.ParseFloat(balance, 32)
 	response := &balanceService.GetBalanceReply{
 		Success: true,
@@ -46,13 +61,20 @@ func (s *server) GetBalance(ctx context.Context, data *balanceService.GetBalance
 	return response, nil
 }
 
+/**
+ * @brief This Update the balance in the database.
+ *
+ * @param ctx context.Context //Context
+ * @param data *balanceService.UpdateBalanceRequest // Reference to the UpdateBalanceRequest Object
+ *
+ * @return *balanceService.UpdateBalanceReply
+ * @return error
+ */
 func (s *server) UpdateBalance(ctx context.Context, data *balanceService.UpdateBalanceRequest) (*balanceService.UpdateBalanceReply, error) {
-
-	db.Init("../../../config/config.toml")
 	table := "account"
 	params := []string{"account_id", ut.IntToString(data.AccountID), "balance", ut.FloatToString(data.Amount)}
 
-	success := db.Update(ctx, table, params)
+	success := database.Update(ctx, table, params, db)
 	response := &balanceService.UpdateBalanceReply{
 		Success: success,
 	}
@@ -60,14 +82,24 @@ func (s *server) UpdateBalance(ctx context.Context, data *balanceService.UpdateB
 }
 
 func main() {
-	balanceConnect, err := net.Listen("tcp", ":8082")
-	ut.CheckError(err, "Could not connect to :8082")
+	//Initializing the database
+	db = database.Init(config)
 
+	//Reading in the configuration variables
+	err := godotenv.Load(config)
+	ut.CheckError(err, "Error loading config.env file")
+	var port string
+	port = ":" + os.Getenv("BALANCE_PORT")
+
+	//Listening to the balance service server
+	balanceConnect, err := net.Listen("tcp", port)
+	ut.CheckError(err, "Could not connect to "+port)
+
+	//Declaring and initializing the gRPC server
 	srv := grpc.NewServer()
 	balanceService.RegisterBalanceServer(srv, &server{})
 	reflection.Register(srv)
 
-	if err = srv.Serve(balanceConnect); err != nil {
-		log.Fatalf("Could not connect to: %v", err)
-	}
+	err = srv.Serve(balanceConnect)
+	ut.CheckError(err, "Could not connect to balance connect")
 }

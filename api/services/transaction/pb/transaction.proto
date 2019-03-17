@@ -5,7 +5,7 @@
  * Author: nknab
  * Email: kojo.anyinam-boateng@outlook.com
  * Version: 1.1
- * Brief: 
+ * Brief: The structre of the transaction service.
  * -----
  * Last Modified: Friday, 15th March 2019 6:40:23 PM
  * Modified By: nknab
@@ -17,6 +17,7 @@ syntax = "proto3";
 
 package transactionService;
 
+//The structure of data required for transaction to occurr.
 message MakeTransaction {
     int32 accountID = 1;
     string description = 2;
@@ -25,12 +26,14 @@ message MakeTransaction {
     string transactionType = 5;
 }
 
+//The structure of a reply after transaction has occurred.
 message MakeTransactionReply {
     bool success = 1;
     int32 id = 2;
     string msg = 3;
 }
 
+//The Transaction service.
 service Transaction {
     rpc transact(MakeTransaction) returns (MakeTransactionReply);
 }
