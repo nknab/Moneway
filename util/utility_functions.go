@@ -16,9 +16,9 @@
 package util
 
 import (
-	"fmt"
 	"google.golang.org/grpc"
 	"log"
+	"strconv"
 )
 
 func Connect(host string, msg string) *grpc.ClientConn {
@@ -38,9 +38,9 @@ func CheckError(err error, msg string) bool {
 }
 
 func IntToString(number int32) string {
-	return fmt.Sprintf("%f", number)
+	return strconv.FormatInt(int64(number), 10)
 }
 
 func FloatToString(number float64) string {
-	return fmt.Sprintf("%f", number)
+	return strconv.FormatFloat(number,'E', -1, 64)
 }

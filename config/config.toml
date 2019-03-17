@@ -12,10 +12,22 @@
 # * -----
 # * Copyright ©2019 nknab
 # */
+#docker.for.mac.
 
 [database]
-server = "docker.for.mac.localhost"
+server = "localhost"
 port = "3306"
 database = "moneway"
 user = "root"
 password = ""
+
+
+[ports]
+    [ports.main]
+    port = "8000"
+
+    [ports.transaction]
+    port = "8081"
+
+    [ports.balance]
+    port = "8082"

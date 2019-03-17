@@ -18,11 +18,10 @@ package database
 import (
 	"database/sql"
 	"fmt"
-	"log"
-
 	"github.com/BurntSushi/toml"
 	_ "github.com/go-sql-driver/mysql"
 	"golang.org/x/net/context"
+	"log"
 )
 
 type Config struct {
@@ -46,9 +45,9 @@ var db *sql.DB
  *
  * @return void
  */
-func Init() {
+func Init(filePath string) {
 	var config Config
-	if _, err := toml.DecodeFile("../config/config.toml", &config); err != nil {
+	if _, err := toml.DecodeFile(filePath, &config); err != nil {
 		fmt.Println(err)
 	}
 	connString := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", config.Database.User, config.Database.Password, config.Database.Server, config.Database.Port, config.Database.Database)
@@ -91,7 +90,7 @@ func Insert(ctx context.Context, table string, columns []string, values []string
 	for i := range values {
 		args[i] = values[i]
 	}
-
+	//fmt.Println(sqlStmt)
 	_, err := db.ExecContext(ctx, sqlStmt, args...)
 	success = checkError(err)
 
@@ -111,7 +110,7 @@ func Select(ctx context.Context, table string, condition []string) string {
 
 	var id = condition[1]
 	sqlStmt := "select " + condition[2] + " from " + table + " where " + condition[0] + " = ?"
-	fmt.Println(sqlStmt)
+	//fmt.Println(sqlStmt)
 
 	var column string
 	stmt, err := db.PrepareContext(ctx, sqlStmt)

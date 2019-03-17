@@ -21,12 +21,9 @@ import (
 	"net/http"
 )
 
-
-
-
 func main() {
 	router := rt.Router()
-
-	log.Fatal(http.ListenAndServe(":8000", router))
+	rt.Run()
+	log.Fatal(http.ListenAndServe(":8080", router))
 
 }

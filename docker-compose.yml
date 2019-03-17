@@ -9,7 +9,7 @@ services:
       - .:/go/src/github.com/nknab/Moneway
     container_name: moneway
     ports:
-      - 8000:8000
+      - 8080:8080
     links:
       - transaction:transaction
       - balance:balance

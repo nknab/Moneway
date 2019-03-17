@@ -16,7 +16,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"strconv"
 
@@ -27,19 +26,16 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
-	// "context"
 	"net"
 )
 
 type server struct{}
 
 func (s *server) GetBalance(ctx context.Context, data *balanceService.GetBalanceRequest) (*balanceService.GetBalanceReply, error) {
-	//ctx, stop := context.WithCancel(context.Background())
-	//defer stop()
-	//Initializing the Database package
-	fmt.Println("In.....")
-	db.Init()
+
+	db.Init("../../../config/config.toml")
 	table := "account"
+
 	conditions := []string{"account_id", ut.IntToString(data.AccountID), "balance"}
 	balance := db.Select(ctx, table, conditions)
 	value, _ := strconv.ParseFloat(balance, 32)
@@ -51,17 +47,12 @@ func (s *server) GetBalance(ctx context.Context, data *balanceService.GetBalance
 }
 
 func (s *server) UpdateBalance(ctx context.Context, data *balanceService.UpdateBalanceRequest) (*balanceService.UpdateBalanceReply, error) {
-	//ctx, stop := context.WithCancel(context.Background())
-	//defer stop()
 
-	//Initializing the Database package
-	db.Init()
+	db.Init("../../../config/config.toml")
 	table := "account"
 	params := []string{"account_id", ut.IntToString(data.AccountID), "balance", ut.FloatToString(data.Amount)}
 
-	// Updating the Balance
 	success := db.Update(ctx, table, params)
-
 	response := &balanceService.UpdateBalanceReply{
 		Success: success,
 	}
@@ -78,6 +69,5 @@ func main() {
 
 	if err = srv.Serve(balanceConnect); err != nil {
 		log.Fatalf("Could not connect to: %v", err)
-
 	}
 }

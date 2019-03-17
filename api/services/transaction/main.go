@@ -36,13 +36,7 @@ var balanceClient balanceService.BalanceClient
 type server struct{}
 
 func (s *server) Transact(ctx context.Context, transaction *transactionService.MakeTransaction) (*transactionService.MakeTransactionReply, error) {
-	//ctx, stop := context.WithCancel(context.Background())
-	//defer stop()
-	fmt.Println("IN Transact")
-	//Initializing the Database package
-	db.Init()
-
-	//This value will comes from the balance service.
+	db.Init("../../../config/config.toml")
 	tempValue, _ := balanceClient.GetBalance(context.Background(), &balanceService.GetBalanceRequest{
 		AccountID: transaction.AccountID,
 	})
