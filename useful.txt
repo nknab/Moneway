@@ -22,3 +22,6 @@ WORKDIR /go/src/github.com/nknab/Moneway/
 docker container ls -a
 
 docker system prune
+
+
+Resp: %vrpc error: code = Unavailable desc = all SubConns are in TransientFailure, latest connection error: connection error: desc = "transport: Error while dialing dial tcp 127.0.0.1:8082: connect: connection refused"

@@ -17,8 +17,16 @@ package util
 
 import (
 	"fmt"
+	"google.golang.org/grpc"
 	"log"
 )
+
+func Connect(host string, msg string) *grpc.ClientConn {
+	conn, err := grpc.Dial(host, grpc.WithInsecure())
+	CheckError(err, msg)
+
+	return conn
+}
 
 func CheckError(err error, msg string) bool {
 	success := true

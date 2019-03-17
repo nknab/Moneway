@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 /*
  * File: compile-services.sh
  * Project: Moneway Go Developper Intern Challenge
@@ -13,5 +14,5 @@
  * Copyright ©2019 nknab
  */
 
-protoc -I . balance/protobuf/balance.proto --go_out=plugins=grpc:.
-protoc -I . transaction/protobuf/transaction.proto --go_out=plugins=grpc:.
+protoc -I . balance/pb/balance.proto --go_out=plugins=grpc:.
+protoc -I . transaction/pb/transaction.proto --go_out=plugins=grpc:.
