@@ -65,6 +65,26 @@ Structure of Transaction Object
 TransactionType can be either **CREDIT** or **DEBIT**
 
 ## Test Results
+1. Running the various servers in terminal. 
+![1](test-images/1.png)
+
+2. Executing the get balance in Postman.
+![2](test-images/2.png)
+
+3. Log from the Get Balance Request in the terminal.
+![3](test-images/3.png)
+
+4. Database before the Make Transaction Request was sent.
+![4](test-images/4.png)
+
+5. Database after the Make Transaction Request was sent.
+![5](test-images/5.png)
+
+6. Showing the updated balance after the Make Transaction Request was sent.
+![6](test-images/6.png)
+
+7. Logs from the various transactions.
+![7](test-images/7.png)
 
 ## Future Works
  1. In order for easy workflow within Moneway, we will be migrating to ScyllaDB.
